@@ -1,6 +1,6 @@
 # LAK Manager
 
-``A Local Access Key Manager for windows desktop applications``
+``A Local Access Key Manager for Windows desktop applications``
 
 ## Overview
 

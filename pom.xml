@@ -10,7 +10,7 @@
 	
 	<properties>
 		<!-- Main Class -->
-		<main.class>com.zjack.lakmanager.KeysLauncher</main.class>
+		<main.class>com.zjack.lakmanager.Launcher</main.class>
 
 		<!-- Project Details -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

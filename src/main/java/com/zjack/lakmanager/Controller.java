@@ -29,11 +29,11 @@ public class Controller {
 
 
     @FXML
-    private ListView<String> listview;
+    private ListView<String> listView;
 
     private static List<CustomKey> keyList;
 
-    private static EncryptionManager ec;
+    private static EncryptionManager encryptionManager;
 
     private static final String FILE_PATH = ""; // TODO Configure FILE_PATH
     private static final String KEYS_FILE_NAME = "keys.yml";
@@ -42,7 +42,7 @@ public class Controller {
     @FXML
     private void initialize() {
         keyList = new ArrayList<>();
-        ec = new EncryptionManager();
+        encryptionManager = new EncryptionManager();
         load();
 
     }
@@ -67,8 +67,8 @@ public class Controller {
         // Save keys to yaml
         try (FileWriter fileWriter = new FileWriter(FILE_PATH + PUBLIC_FILE_NAME)) {
             Map<String, Object> data = new HashMap<>();
-            data.put("public", encodePublicToString(ec.getPublicKey()));
-            data.put("private", encodePrivateToString(ec.getPrivateKey()));
+            data.put("public", encodePublicToString(encryptionManager.getPublicKey()));
+            data.put("private", encodePrivateToString(encryptionManager.getPrivateKey()));
 
             // Dump the data to YAML and write to the file
             DumperOptions options = new DumperOptions();
@@ -102,9 +102,9 @@ public class Controller {
                 // Transform the list of maps into a list of keys and decrypt
                 for (Map<String, String> keyInfo : mapList) {
                     CustomKey key = new CustomKey(
-                            ec.decrypt(keyInfo.get("user")),
-                            ec.decrypt(keyInfo.get("key")),
-                            ec.decrypt(keyInfo.get("expiryDate"))
+                            encryptionManager.decrypt(keyInfo.get("user")),
+                            encryptionManager.decrypt(keyInfo.get("key")),
+                            encryptionManager.decrypt(keyInfo.get("expiryDate"))
                     );
                     keyList.add(key);
                 }
@@ -112,7 +112,7 @@ public class Controller {
 
             // Set the transformed list to the ListView
             ObservableList<String> items = formatList(keyList);
-            listview.setItems(items);
+            listView.setItems(items);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,9 +127,9 @@ public class Controller {
         // Transform the list of keys into a list of maps
         for (CustomKey key : keyList) {
             Map<String, String> keyInfo = new HashMap<>();
-            keyInfo.put("user", ec.encrypt(key.getUser()));
-            keyInfo.put("key", ec.encrypt(key.getKey()));
-            keyInfo.put("expiryDate", ec.encrypt(key.getExpiryDate()));
+            keyInfo.put("user", encryptionManager.encrypt(key.getUser()));
+            keyInfo.put("key", encryptionManager.encrypt(key.getKey()));
+            keyInfo.put("expiryDate", encryptionManager.encrypt(key.getExpiryDate()));
             newMapList.add(keyInfo);
         }
 
@@ -158,7 +158,7 @@ public class Controller {
         if (optional.isPresent()) {
             CustomKey key = optional.get();
             // Add key to the listview
-            listview.getItems().add(("User Name: " + key.getUser() +
+            listView.getItems().add(("User Name: " + key.getUser() +
                     ", Key Name: " + key.getKey() +
                     ", Expiry Date: " + key.getExpiryDate()));
 
@@ -264,7 +264,7 @@ public class Controller {
     @FXML
     private void remove() {
 
-        int index = listview.getSelectionModel().getSelectedIndex();
+        int index = listView.getSelectionModel().getSelectedIndex();
 
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirm Delete Request");
@@ -281,17 +281,17 @@ public class Controller {
         if (result.isPresent() && result.get() == ButtonType.YES) {
 
             keyList.remove(index);
-            listview.setItems(formatList(keyList));
+            listView.setItems(formatList(keyList));
 
         }
-        listview.getSelectionModel().selectFirst();
+        listView.getSelectionModel().selectFirst();
         save();
     }
 
     @FXML
     private void copy() {
 
-        int index = listview.getSelectionModel().getSelectedIndex();
+        int index = listView.getSelectionModel().getSelectedIndex();
         CustomKey key = keyList.get(index);
         String textToCopy = key.getKey();
 
